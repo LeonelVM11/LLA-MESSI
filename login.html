@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="styles1.css">
+    <title>Iniciar Sesión</title>
+    <style>
+        body {
+            background-color: #f0f0f0; /* Fondo gris */
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        .header {
+            background-color: #0078d4; /* Panel azul */
+            color: #fff; /* Texto blanco */
+            text-align: center;
+            padding: 20px;
+            font-size: 36px; /* Tamaño de fuente más grande */
+            position: fixed; /* Fijar la posición en la parte superior */
+            top: 0; /* Alinear en la parte superior */
+            width: 100%; /* Ocupar toda la anchura */
+        }
+
+        .container {
+            background-color: #fff; /* Panel blanco */
+            margin: 80px auto 20px; /* Añadir margen superior para evitar la superposición */
+            padding: 50px;
+            width: 300px; /* Ancho del panel */
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1); /* Sombra suave */
+            border-radius: 5px;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+        }
+
+        label {
+            margin-bottom: 10px;
+        }
+
+        input[type="text"],
+        input[type="password"] {
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+        }
+
+        button[type="submit"] {
+            background-color: #0078d4; /* Color de botón azul */
+            color: #fff;
+            padding: 10px;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+
+        button[type="submit"]:hover {
+            background-color: #005ea2; /* Color de botón azul oscuro al pasar el mouse */
+        }
+
+        #mensaje {
+            font-size: 18px;
+            color: green;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        Timesheet
+    </div>
+    
+    <div class="container">
+        <h1>Iniciar Sesión</h1>
+        <form id="login-form">
+            <label for="id_user">Nombre de Usuario:</label>
+            <input type="text" id="id_user" name="id_user" required>
+            <label for="pwrd">Contraseña:</label>
+            <input type="password" id="pwrd" name="pwrd" required>
+            <button type="submit">Iniciar Sesión</button>
+        </form>
+        <div id="mensaje"></div>
+    </div>
+
+    <script>
+        const loginForm = document.getElementById("login-form");
+        const mensajeDiv = document.getElementById("mensaje");
+
+        loginForm.addEventListener("submit", async (e) => {
+            e.preventDefault();
+
+            const id_user = loginForm.elements.id_user.value;
+            const pwrd = loginForm.elements.pwrd.value;
+
+            try {
+                const response = await fetch("/login", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({ id_user, pwrd }),
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    mensajeDiv.textContent = data.message;
+                    mensajeDiv.style.color = "green";
+
+                    // Redirigir a la página principal u otra página después del inicio de sesión exitoso
+                    setTimeout(() => {
+                        window.location.href = '/public/index.html'; // Cambia la URL de redirección según tu configuración
+                    }, 2000);
+                } else {
+                    const data = await response.json();
+                    mensajeDiv.textContent = data.error;
+                    mensajeDiv.style.color = "red";
+                }
+            } catch (error) {
+                console.error("Error al procesar la solicitud:", error);
+                mensajeDiv.textContent = "Error al iniciar sesión. Por favor, inténtalo de nuevo.";
+                mensajeDiv.style.color = "red";
+            }
+        });
+    </script>
+</body>
+</html>

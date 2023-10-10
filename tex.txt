@@ -1,0 +1,68 @@
+// Crear la tabla timesheet con un ID autoincremental
+db.serialize(() => {
+    db.run(`CREATE TABLE IF NOT EXISTS timesheet (
+        id_usuario INTEGER PRIMARY KEY ,
+        id_registro INTEGER NOT NULL,
+        contra TEXT NOT NULL,
+        nombre TEXT NOT NULL,
+        tarea TEXT NOT NULL,
+        horas_trabajadas INTEGER NOT NULL
+    )`);
+});
+
+
+
+
+app.post(`/api/timesheet`, (req, res) => {
+
+    const sql = "SELECT id_registro FROM timesheet ORDER BY id_registro DESC LIMIT 1";
+    db.get(sql, [], (err, row) => {
+        if (err) {
+            console.error("Error al ejecutar la consulta:", err.message);
+            return;
+        }
+
+        if (row) {
+            const idRegistroLast = row.id_registro;
+            console.log("Último id_registro:", idRegistroLast);
+            // Puedes realizar otras acciones con idRegistroLast aquí
+        } else {
+            console.log("No se encontraron registros en la tabla timesheet.");
+        }
+    });
+    const { id_usuario, contra,nombre, tarea, horas_trabajadas } = req.body;
+    console.log("dato horas trabajadas> " + horas_trabajadas);
+    let id_registro = idRegistroLast + 1; 
+    if (id_usuario && id_registro  && nombre && contra && tarea && horas_trabajadas) {
+        const stmt = db.prepare("INSERT INTO timesheet (id_usuario, id_registro, contra,nombre, tarea, horas_trabajadas) VALUES (?, ?, ?, ?, ?, ?)");
+        stmt.run(id_usuario, id_registro ,contra,nombre, tarea, horas_trabajadas, function (err) {
+            if (err) {
+                return res.status(500).json({ error: "Error al guardar el registro en la base de datos" });
+            }
+
+            const nuevoRegistro = {
+                id,
+                nombre,
+                tarea,
+                horas_trabajadas,
+            };
+
+            res.status(201).json({ message: "Registro agregado con éxito", data: nuevoRegistro });
+
+            io.emit("nuevoRegistro", nuevoRegistro); // Emitir el nuevo registro a los clientes
+        });
+
+        stmt.finalize();
+    } else {
+        res.status(400).json({ error: "Faltan datos en el formulario" });
+    }
+});
+
+app.get(`/api/timesheet`, (req, res) => {
+    db.all("SELECT * FROM timesheet", (err, rows) => {
+        if (err) {
+            return res.status(500).json({ error: "Error al obtener los registros de la base de datos" });
+        }
+        res.json(rows);
+    });
+});

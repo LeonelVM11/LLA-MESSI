@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Timesheet App</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .records-container {
+            max-height: 250px;
+            /* Altura máxima de la tabla */
+            overflow-y: scroll;
+            /* Agrega una barra de desplazamiento vertical */
+            position: relative;
+            /* Permite posicionar elementos hijos de manera relativa */
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <nav>
+            <h1>Timesheet App</h1>
+        </nav>
+    </header>
+    <main>
+        <div class="container">
+            <form id="timesheet-form">
+                <label for="tarea">Tarea Realizada:</label>
+                <input type="text" id="tarea" required>
+                <label for="horas_trabajadas">Horas Trabajadas:</label>
+                <input type="text" id="horas_trabajadas" required>
+                <button type="submit">Guardar Registro</button>
+            </form>
+        </div>
+        <h2>Registros de Tiempo</h2>
+        <div class="records-container">
+            <table id="timesheet-table">
+                <thead>
+                    <tr>
+                        <th>Tarea</th>
+                        <th>Horas Trabajadas</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Los registros de tiempo se mostrarán aquí -->
+                </tbody>
+            </table>
+        </div>
+        <h2>Horas Totales Trabajadas</h2>
+        <p id="total-hours">0</p>
+
+    </main>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="script.js"></script>
+</body>
+
+</html>
